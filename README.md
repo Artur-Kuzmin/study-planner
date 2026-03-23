@@ -15,7 +15,7 @@ Students managing coursework and deadlines.
 - Next.js (React framework)
 - Deployed on Vercel
 
-## Tech Stack
+## User Stories
 1. As a student, I want to add a new task, so that I can keep track of upcoming assignments.
 2. As a student, I want to view all my tasks in one place, so that I can manage my workload easily.
 3. As a student, I want to update task details, so that my task list stays accurate.
