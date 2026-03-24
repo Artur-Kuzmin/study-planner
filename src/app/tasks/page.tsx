@@ -16,6 +16,12 @@ export default function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedSubject, setSelectedSubject] = useState<string>("All Subjects");
+
+  const subjects = ["All Subjects", ...Array.from(new Set(tasks.map((t) => t.subject)))];
+  const filteredTasks = selectedSubject === "All Subjects" 
+    ? tasks 
+    : tasks.filter((t) => t.subject === selectedSubject);
 
   useEffect(() => {
     async function fetchTasks() {
@@ -70,6 +76,26 @@ export default function TasksPage() {
         </header>
 
         <main>
+          {!isLoading && !error && tasks.length > 0 && (
+            <div className="mb-6 flex items-center justify-end">
+              <label htmlFor="subject-filter" className="mr-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                Filter by Subject:
+              </label>
+              <select
+                id="subject-filter"
+                value={selectedSubject}
+                onChange={(e) => setSelectedSubject(e.target.value)}
+                className="block w-48 rounded-lg border-0 py-2 pl-3 pr-10 text-sm ring-1 ring-inset ring-zinc-300 focus:ring-2 focus:ring-indigo-600 dark:bg-zinc-950 dark:text-zinc-50 dark:ring-zinc-700 dark:focus:ring-indigo-500 shadow-sm"
+              >
+                {subjects.map((subject) => (
+                  <option key={subject} value={subject}>
+                    {subject}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-24">
               <div className="h-12 w-12 animate-spin rounded-full border-4 border-zinc-200 border-t-indigo-600 dark:border-zinc-800 dark:border-t-indigo-500"></div>
@@ -90,9 +116,14 @@ export default function TasksPage() {
               <p className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">No tasks found</p>
               <p className="mt-2 text-zinc-500 dark:text-zinc-400">You're all caught up! Enjoy your free time.</p>
             </div>
+          ) : filteredTasks.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 text-center rounded-2xl border-2 border-dashed border-zinc-200 dark:border-zinc-800">
+              <p className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">No tasks match this subject</p>
+              <p className="mt-2 text-zinc-500 dark:text-zinc-400">Try selecting a different subject or "All Subjects".</p>
+            </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {tasks.map((task) => (
+              {filteredTasks.map((task) => (
                 <div
                   key={task.id}
                   className="group relative flex flex-col justify-between overflow-hidden rounded-2xl bg-white dark:bg-zinc-900 p-6 shadow-sm ring-1 ring-zinc-200 transition-all hover:shadow-md dark:ring-zinc-800"
