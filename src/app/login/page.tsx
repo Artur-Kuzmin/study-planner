@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { GuestButton } from "@/components/GuestButton";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -98,18 +99,7 @@ export default function LoginPage() {
                 {isLoading ? "Signing in..." : "Sign In"}
               </button>
               
-              <button
-                type="button"
-                onClick={async () => {
-                  const res = await fetch("/api/auth/guest", { method: "POST" });
-                  if (res.ok) {
-                    window.location.href = "/tasks";
-                  }
-                }}
-                className="text-sm font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors"
-              >
-                Continue as Guest
-              </button>
+              <GuestButton />
             </div>
             
             <p className="text-center text-sm text-zinc-600 dark:text-zinc-400 mt-6">
