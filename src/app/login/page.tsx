@@ -89,13 +89,26 @@ export default function LoginPage() {
               />
             </div>
 
-            <div className="pt-4">
+            <div className="pt-4 flex flex-col items-center gap-4">
               <button
                 type="submit"
                 disabled={isLoading}
                 className="w-full inline-flex items-center justify-center rounded-full bg-indigo-600 px-8 py-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500 disabled:opacity-70 dark:bg-indigo-500 dark:hover:bg-indigo-400"
               >
                 {isLoading ? "Signing in..." : "Sign In"}
+              </button>
+              
+              <button
+                type="button"
+                onClick={async () => {
+                  const res = await fetch("/api/auth/guest", { method: "POST" });
+                  if (res.ok) {
+                    window.location.href = "/tasks";
+                  }
+                }}
+                className="text-sm font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors"
+              >
+                Continue as Guest
               </button>
             </div>
             

@@ -13,6 +13,15 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  if (session === "guest_user") {
+    return NextResponse.json({ 
+      id: "guest", 
+      name: "Guest User", 
+      email: "guest@planner.app", 
+      profilePic: "" 
+    });
+  }
+
   if (!existsSync(dataFilePath)) {
     return NextResponse.json({ error: "No users found" }, { status: 404 });
   }

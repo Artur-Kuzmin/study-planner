@@ -54,6 +54,17 @@ export default async function Home() {
               >
                 <span>Create Account</span>
               </Link>
+              <button
+                onClick={async () => {
+                  const res = await fetch("/api/auth/guest", { method: "POST" });
+                  if (res.ok) {
+                    window.location.href = "/tasks";
+                  }
+                }}
+                className="text-sm font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors"
+              >
+                Continue as Guest
+              </button>
             </>
           )}
         </div>

@@ -62,3 +62,30 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: "Failed to delete task" }, { status: 500 });
   }
 }
+
+export async function PATCH(request: Request) {
+  try {
+    const { id, completed } = await request.json();
+    
+    if (id === undefined || completed === undefined) {
+      return NextResponse.json({ error: "Task ID and completed status are required" }, { status: 400 });
+    }
+
+    const fileContents = readFileSync(dataFilePath, "utf-8");
+    const data = JSON.parse(fileContents);
+    
+    const taskIndex = data.tasks.findIndex((task: any) => task.id === id || String(task.id) === String(id));
+    
+    if (taskIndex === -1) {
+      return NextResponse.json({ error: "Task not found" }, { status: 404 });
+    }
+    
+    data.tasks[taskIndex].completed = completed;
+    writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
+    
+    return NextResponse.json(data.tasks[taskIndex], { status: 200 });
+  } catch (error) {
+    console.error("Error updating task:", error);
+    return NextResponse.json({ error: "Failed to update task" }, { status: 500 });
+  }
+}

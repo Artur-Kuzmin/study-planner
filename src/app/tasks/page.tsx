@@ -50,6 +50,32 @@ export default function TasksPage() {
     }
   };
 
+  const handleToggleComplete = async (id: string | number, currentStatus: boolean) => {
+    try {
+      const res = await fetch("/api/tasks", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, completed: !currentStatus }),
+      });
+
+      if (!res.ok) throw new Error("Failed to update task");
+
+      setTasks((prev) =>
+        prev.map((task) => (task.id === id ? { ...task, completed: !currentStatus } : task))
+      );
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to update task");
+    }
+  };
+
+  const isOverdue = (task: Task) => {
+    if (task.completed) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const dueDate = new Date(task.dueDate);
+    return dueDate < today;
+  };
+
   useEffect(() => {
     async function fetchTasks() {
       try {
@@ -184,6 +210,15 @@ export default function TasksPage() {
                           </svg>
                           Done
                         </span>
+                      ) : isOverdue(task) ? (
+                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-red-600 dark:text-red-400">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="8" x2="12" y2="12" />
+                            <line x1="12" y1="16" x2="12.01" y2="16" />
+                          </svg>
+                          Overdue
+                        </span>
                       ) : (
                         <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-600 dark:text-amber-400">
                           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -194,9 +229,26 @@ export default function TasksPage() {
                         </span>
                       )}
                     </div>
-                    <h3 className={`text-lg font-semibold leading-snug tracking-tight mb-2 ${task.completed ? 'text-zinc-500 dark:text-zinc-500 line-through' : 'text-zinc-900 dark:text-zinc-100'}`}>
-                      {task.title}
-                    </h3>
+                    <div className="flex items-start gap-3">
+                      <button
+                        onClick={() => handleToggleComplete(task.id, task.completed)}
+                        className={`mt-1 flex-none h-5 w-5 rounded-md border-2 transition-colors flex items-center justify-center ${
+                          task.completed 
+                            ? 'bg-emerald-500 border-emerald-500 text-white' 
+                            : 'border-zinc-300 dark:border-zinc-700 hover:border-emerald-500 dark:hover:border-emerald-500'
+                        }`}
+                        aria-label={task.completed ? "Mark as incomplete" : "Mark as complete"}
+                      >
+                        {task.completed && (
+                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M20 6 9 17l-5-5" />
+                          </svg>
+                        )}
+                      </button>
+                      <h3 className={`text-lg font-semibold leading-snug tracking-tight mb-2 ${task.completed ? 'text-zinc-500 dark:text-zinc-500 line-through' : 'text-zinc-900 dark:text-zinc-100'}`}>
+                        {task.title}
+                      </h3>
+                    </div>
                   </div>
 
                   <div className="mt-6 flex items-center justify-between">
