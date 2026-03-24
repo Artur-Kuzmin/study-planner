@@ -1,0 +1,11 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Artur Kuzmin",
+      "email": "arthurkuzmin75@gmail.com",
+      "password": "ArthurKuzmin05102005",
+      "profilePic": ""
+    }
+  ]
+}

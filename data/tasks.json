@@ -1,28 +1,44 @@
 {
-    "tasks": [
-        {
-            "id": 1,
-            "title": "Study for math exam",
-            "dueDate": "2026-03-20",
-            "subject": "Mathematics",
-            "priority": "high",
-            "completed": false
-        },
-        {
-            "id": 2,
-            "title": "Read chapter 5",
-            "dueDate": "2026-03-18",
-            "subject": "Literature",
-            "priority": "medium",
-            "completed": true
-        },
-        {
-            "id": 3,
-            "title": "Prepare presentation slides",
-            "dueDate": "2026-03-22",
-            "subject": "History",
-            "priority": "low",
-            "completed": false
-        }
-    ]
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Study for math exam",
+      "dueDate": "2026-03-20",
+      "subject": "Mathematics",
+      "priority": "high",
+      "completed": false
+    },
+    {
+      "id": 2,
+      "title": "Read chapter 5",
+      "dueDate": "2026-03-18",
+      "subject": "Literature",
+      "priority": "medium",
+      "completed": true
+    },
+    {
+      "id": 3,
+      "title": "Prepare presentation slides",
+      "dueDate": "2026-03-22",
+      "subject": "History",
+      "priority": "low",
+      "completed": false
+    },
+    {
+      "title": "read book to ekemena",
+      "subject": "english",
+      "dueDate": "2026-03-25",
+      "priority": "high",
+      "completed": false,
+      "id": 4
+    },
+    {
+      "title": "make app",
+      "subject": "Applications ",
+      "dueDate": "2026-03-27",
+      "priority": "high",
+      "completed": false,
+      "id": 5
+    }
+  ]
 }

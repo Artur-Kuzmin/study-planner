@@ -1,6 +1,10 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
 
-export default function Home() {
+export default async function Home() {
+  const cookieStore = await cookies();
+  const session = cookieStore.get("auth_session")?.value;
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-cyan-50 text-slate-900 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800 dark:text-slate-50 font-sans p-6 overflow-hidden relative">
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-200/50 dark:bg-indigo-900/20 blur-3xl pointer-events-none" />
@@ -24,17 +28,34 @@ export default function Home() {
           </p>
         </div>
 
-        <div>
-          <Link
-            href="/tasks"
-            className="group relative flex h-14 items-center justify-center gap-3 rounded-full bg-slate-900 px-8 text-base font-semibold text-white shadow-lg shadow-slate-900/20 transition-all hover:bg-slate-800 hover:-translate-y-0.5 hover:shadow-xl dark:bg-white dark:text-slate-900 dark:shadow-white/10 dark:hover:bg-slate-100 sm:text-lg"
-          >
-            <span>View My Tasks</span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transition-transform group-hover:translate-x-1">
-              <path d="M5 12h14" />
-              <path d="m12 5 7 7-7 7" />
-            </svg>
-          </Link>
+        <div className="mt-4 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-6">
+          {session ? (
+            <Link
+              href="/tasks"
+              className="group relative flex h-14 items-center justify-center gap-3 rounded-full bg-slate-900 px-8 text-base font-semibold text-white shadow-lg shadow-slate-900/20 transition-all hover:bg-slate-800 hover:-translate-y-0.5 hover:shadow-xl dark:bg-white dark:text-slate-900 dark:shadow-white/10 dark:hover:bg-slate-100 sm:text-lg"
+            >
+              <span>View My Tasks</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transition-transform group-hover:translate-x-1">
+                <path d="M5 12h14" />
+                <path d="m12 5 7 7-7 7" />
+              </svg>
+            </Link>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="group relative flex h-14 items-center justify-center gap-3 rounded-full bg-indigo-600 px-8 text-base font-semibold text-white shadow-lg shadow-indigo-600/20 transition-all hover:bg-indigo-500 hover:-translate-y-0.5 hover:shadow-xl dark:bg-indigo-500 dark:hover:bg-indigo-400 sm:text-lg"
+              >
+                <span>Sign In</span>
+              </Link>
+              <Link
+                href="/register"
+                className="group relative flex h-14 items-center justify-center gap-3 rounded-full bg-white px-8 text-base font-semibold text-slate-900 shadow-md ring-1 ring-inset ring-slate-200 transition-all hover:bg-slate-50 hover:-translate-y-0.5 hover:shadow-lg dark:bg-slate-900 dark:text-white dark:ring-slate-800 dark:hover:bg-slate-800 sm:text-lg"
+              >
+                <span>Create Account</span>
+              </Link>
+            </>
+          )}
         </div>
       </main>
     </div>

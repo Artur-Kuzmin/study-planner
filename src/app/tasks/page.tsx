@@ -23,11 +23,46 @@ export default function TasksPage() {
     ? tasks 
     : tasks.filter((t) => t.subject === selectedSubject);
 
+  const handleDelete = async (id: string | number) => {
+    if (!window.confirm("Are you sure you want to delete this task?")) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/tasks?id=${id}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to delete task");
+      }
+
+      setTasks((prev) => prev.filter((task) => task.id !== id));
+      
+      const currentTask = tasks.find((t) => t.id === id);
+      const remainingTasksForSubject = tasks.filter((t) => t.id !== id && t.subject === currentTask?.subject);
+      
+      if (currentTask && remainingTasksForSubject.length === 0 && selectedSubject === currentTask.subject) {
+        setSelectedSubject("All Subjects");
+      }
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to delete task");
+    }
+  };
+
   useEffect(() => {
     async function fetchTasks() {
       try {
         const res = await fetch("/api/tasks");
-        if (!res.ok) throw new Error("Failed to fetch tasks");
+        if (!res.ok) {
+          if (res.status === 401) {
+            import("next/navigation").then(({ redirect }) => {
+               window.location.href = "/login";
+            });
+            return;
+          }
+          throw new Error("Failed to fetch tasks");
+        }
         const data = await res.json();
         setTasks(data || []);
       } catch (err) {
@@ -77,22 +112,31 @@ export default function TasksPage() {
 
         <main>
           {!isLoading && !error && tasks.length > 0 && (
-            <div className="mb-6 flex items-center justify-end">
-              <label htmlFor="subject-filter" className="mr-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                Filter by Subject:
-              </label>
-              <select
-                id="subject-filter"
-                value={selectedSubject}
-                onChange={(e) => setSelectedSubject(e.target.value)}
-                className="block w-48 rounded-lg border-0 py-2 pl-3 pr-10 text-sm ring-1 ring-inset ring-zinc-300 focus:ring-2 focus:ring-indigo-600 dark:bg-zinc-950 dark:text-zinc-50 dark:ring-zinc-700 dark:focus:ring-indigo-500 shadow-sm"
-              >
-                {subjects.map((subject) => (
-                  <option key={subject} value={subject}>
-                    {subject}
-                  </option>
-                ))}
-              </select>
+            <div className="mb-10 flex items-center justify-end -mt-4">
+              <div className="flex items-center gap-3 rounded-xl bg-white px-4 py-2.5 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
+                <label htmlFor="subject-filter" className="whitespace-nowrap text-sm font-medium text-zinc-600 dark:text-zinc-400">
+                  Filter by Subject:
+                </label>
+                <div className="relative">
+                  <select
+                    id="subject-filter"
+                    value={selectedSubject}
+                    onChange={(e) => setSelectedSubject(e.target.value)}
+                    className="block w-full min-w-[140px] appearance-none rounded-lg border-0 bg-zinc-50 py-1.5 pl-3 pr-8 text-sm font-medium text-zinc-900 ring-1 ring-inset ring-zinc-300 focus:ring-2 focus:ring-indigo-600 dark:bg-black dark:text-zinc-50 dark:ring-zinc-700 dark:focus:ring-indigo-500 cursor-pointer"
+                  >
+                    {subjects.map((subject) => (
+                      <option key={subject} value={subject}>
+                        {subject}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                    <svg className="h-4 w-4 text-zinc-500 dark:text-zinc-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
@@ -165,16 +209,31 @@ export default function TasksPage() {
                       </svg>
                       <span>Due: {task.dueDate}</span>
                     </div>
-                    {task.priority && (
-                      <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-1 rounded-sm ${task.priority === 'high'
-                          ? 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400'
-                          : task.priority === 'medium'
-                            ? 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400'
-                            : 'bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400'
-                        }`}>
-                        {task.priority}
-                      </span>
-                    )}
+                    <div className="flex items-center gap-2">
+                      {task.priority && (
+                        <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-1 rounded-sm ${task.priority === 'high'
+                            ? 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400'
+                            : task.priority === 'medium'
+                              ? 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400'
+                              : 'bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400'
+                          }`}>
+                          {task.priority}
+                        </span>
+                      )}
+                      <button
+                        onClick={() => handleDelete(task.id)}
+                        className="inline-flex items-center justify-center rounded-md p-1.5 text-zinc-400 transition hover:bg-red-50 hover:text-red-600 dark:text-zinc-500 dark:hover:bg-red-500/10 dark:hover:text-red-400 focus:outline-none"
+                        title="Delete task"
+                        aria-label="Delete task"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="3 6 5 6 21 6" />
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                          <line x1="10" y1="11" x2="10" y2="17" />
+                          <line x1="14" y1="11" x2="14" y2="17" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}

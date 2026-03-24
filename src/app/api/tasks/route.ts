@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     const data = JSON.parse(fileContents);
 
     const newTask = await request.json();
-    newTask.id = data.tasks.length + 1;
+    newTask.id = data.tasks.length > 0 ? Math.max(...data.tasks.map((t: any) => t.id)) + 1 : 1;
 
     data.tasks.push(newTask);
     writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
@@ -30,5 +30,35 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("Error saving task:", error);
     return NextResponse.json({ error: "Failed to save task" }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const idParam = searchParams.get("id");
+    
+    if (!idParam) {
+      return NextResponse.json({ error: "Task ID is required" }, { status: 400 });
+    }
+
+    const taskId = Number(idParam);
+    const fileContents = readFileSync(dataFilePath, "utf-8");
+    const data = JSON.parse(fileContents);
+    
+    const initialLength = data.tasks.length;
+    // Filter out the task by testing both the number form and string form of the ID for safety
+    data.tasks = data.tasks.filter((task: any) => task.id !== taskId && String(task.id) !== idParam);
+    
+    if (data.tasks.length === initialLength) {
+      return NextResponse.json({ error: "Task not found" }, { status: 404 });
+    }
+    
+    writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
+    
+    return NextResponse.json({ message: "Task deleted successfully" }, { status: 200 });
+  } catch (error) {
+    console.error("Error deleting task:", error);
+    return NextResponse.json({ error: "Failed to delete task" }, { status: 500 });
   }
 }
